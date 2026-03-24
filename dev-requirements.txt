@@ -1,0 +1,15 @@
+# Development dependencies – code quality tools
+# Install with: pip install -r dev-requirements.txt
+
+# Linting + formatting + import sorting
+ruff==0.9.6
+
+# Deep static analysis with educational error messages
+pylint==3.3.4
+
+# Static type checking
+mypy==1.14.1
+
+# Flask/SQLAlchemy type stubs (needed by mypy)
+flask-stubs==0.1.0
+sqlalchemy[mypy]==2.0.37

@@ -1,0 +1,21 @@
+# Environment variables – never commit secrets
+.env
+
+# SQLite database created at runtime
+instance/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Linter and type-checker caches
+.ruff_cache/
+.mypy_cache/
+
+# macOS metadata
+.DS_Store

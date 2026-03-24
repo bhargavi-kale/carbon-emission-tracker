@@ -1,0 +1,6 @@
+# Runtime dependencies – install with: pip install -r requirements.txt
+
+Flask==3.1.0
+Flask-SQLAlchemy==3.1.1
+requests==2.32.3
+python-dotenv==1.0.1
