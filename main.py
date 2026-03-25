@@ -1,17 +1,15 @@
-"""Entry point for the Carbon Commute application.
+from flask import Flask, render_template, request
+from src.route import Route
+from src.trip import Trip
+from src.vehicle import Vehicle
 
-This module provides a small CLI entry point that creates and runs
-the main `CarbonCommute` application object.
-"""
+app = Flask(__name__)
 
-import src.carbon_commute
+@app.route("/")
+def home():
+    return render_template("index.html")
 
-
-def main():
-    """Create and run the CarbonCommute application."""
-    app = src.carbon_commute.CarbonCommute()
-    app.run()
 
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
