@@ -1,78 +1,110 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
-    margin: 0;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 
     background-image: url("/static/background.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
 
-    display: flex;
-    flex-direction: column;
+    /* REMOVE this for mobile issues */
+    /* background-attachment: fixed; */
 }
 
-
-
+/* HEADER */
 header {
     text-align: center;
-    border-radius: 80px;
-    width: 100%;              /* FIXED */
-    margin: 20px auto;        /* centers it */
     padding: 10px;
+    margin-top: 10px;
 }
 
-
-
 h1 {
-    font-size: 30px;
+    font-size: 2rem;
     color: #464f41;
     font-family: 'Consolas', monospace;
 }
 
-
-
+/* MAIN (takes remaining space) */
 main {
-    flex: 1;   
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+/* FORM */
+form {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+}
 
+/* FOOTER */
 footer {
-    position: relative;
-    z-index: 1;
     text-align: center;
-
-    margin: 20px auto;
-    padding: .5rem 0;
-    max-width: 900px;
-    color: #000000;
+    padding: 10px;
+    font-size: 1.0rem;
     font-family: 'Consolas', monospace;
     font-weight: bold;
-
-    
+    z-index: 2;
+    /* bottom:10px; */
+    margin:10px;
 }
 
-
-
+/* FLOWER FIELD */
 .flowerfield {
-    content: "";
-    position: absolute;
-
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -3rem;
+    position: fixed;  /* FIX: stays at bottom */
+    bottom: 0;
+    left: 0;
 
     width: 100%;
-    height: 5rem;
+    height: 80px;
 
     background-image: url("/static/flowerfield.gif");
     background-repeat: repeat-x;
-    background-position: center bottom;
+    background-position: bottom;
     background-size: contain;
 
-    z-index: -1;   
     pointer-events: none;
-} 
+    z-index: -1;
+}
 
+/* RESPONSIVE MEDIA QUERIES */
 
+/* Mobile */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    form {
+        width: 95%;
+        padding: 15px;
+    }
+
+    footer {
+        font-size: 0.75rem;
+    }
+
+    .flowerfield {
+        height: 60px;
+    }
+}
+
+/* Tablet */
+@media (min-width: 601px) and (max-width: 1024px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    form {
+        max-width: 600px;
+    }
+}
