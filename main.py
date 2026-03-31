@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, render_template, request
 from src.route import Route
 from src.trip import Trip
@@ -7,7 +10,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html") #flaskstuff
+    API_KEY = os.getenv("GOOGLE_API_KEY")
+    return render_template("index.html", API_KEY=API_KEY) #flaskstuff
 
 
 
