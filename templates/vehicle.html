@@ -1,0 +1,60 @@
+{% extends "index.html" %}
+
+{% block content %}
+<section class="left-panel">
+    <h2>Add your Vehicle</h2>
+
+    <form action="/calculate" method="POST">
+        <label>Vehicle Make</label>
+        <select id="make_select" name="make" required>
+            <option value="">Select a Make</option>
+            {% for make in makes %}
+                <option value="{{ make }}">{{ make }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Model</label>
+        <select id="model_select" name="model" disabled required>
+            <option value="">Select a Model</option>
+        </select>
+
+        <label>Year</label>
+        <select id="year_select" name="year" disabled required>
+            <option value="">Select a Year</option>
+        </select>
+
+        <button type="submit">Save Vehicle</button>
+    </form>
+</section>
+
+<script>
+    const makeSelect = document.getElementById('make_select');
+    const modelSelect = document.getElementById('model_select');
+    const yearSelect = document.getElementById('year_select');
+
+    // When Make changes, fetch Models
+    makeSelect.onchange = () => {
+        modelSelect.disabled = true;
+        yearSelect.disabled = true;
+        
+        fetch(`/get_models/${makeSelect.value}`)
+            .then(res => res.json())
+            .then(data => {
+                modelSelect.innerHTML = '<option value="">Select a Model</option>';
+                data.forEach(m => modelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+                modelSelect.disabled = false;
+            });
+    };
+
+    // When Model changes, fetch Years
+    modelSelect.onchange = () => {
+        fetch(`/get_years/${makeSelect.value}/${modelSelect.value}`)
+            .then(res => res.json())
+            .then(data => {
+                yearSelect.innerHTML = '<option value="">Select a Year</option>';
+                data.forEach(y => yearSelect.innerHTML += `<option value="${y}">${y}</option>`);
+                yearSelect.disabled = false;
+            });
+    };
+</script>
+{% endblock %}
