@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+
+
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <title>Carbon Commute Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body>
 
@@ -11,32 +14,24 @@
     <h1>Carbon Commute Calculator</h1>
 </header>
 
+
 <main>
-
-
-
-    <form 
-    </form>
-
-
-
-</main>
-
-
-
-
-
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
     
 
 
-
-
-
-
-
-
-
-
+</main>
 
 
 
@@ -47,6 +42,40 @@
 <footer>
     <p>&copy; 2026 Bhargavi Kale, Isabella Velazquez-Abelardo | Carbon Commute Calculator </p>
 </footer>
+<script>
+    function initMap() {
+        const center = { lat: 43.1339, lng: -70.9264 }; // UNH / Durham area
 
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 12,
+            center: center,
+        });
+
+        new google.maps.Marker({
+            position: center,
+            map: map,
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find all elements with the "alert" class
+        const alerts = document.querySelectorAll('.alert');
+        
+        alerts.forEach(function(alert) {
+            // Set a timer for 10000 milliseconds (10 seconds)
+            setTimeout(function() {
+                // Add a fade-out effect via CSS opacity
+                alert.style.transition = "opacity 0.6s ease";
+                alert.style.opacity = "0";
+                
+                // Remove the element from the DOM entirely after it fades
+                setTimeout(() => alert.remove(), 600);
+            }, 10000);
+        });
+    });
+</script>
+
+<script async
+src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&callback=initMap">
+</script>
 </body>
 </html>

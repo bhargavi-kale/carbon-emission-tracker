@@ -1,0 +1,48 @@
+{% extends "index.html" %}
+
+
+{% block content %}
+    <section class="left-panel">
+        <h2>Plan Your Trip</h2>
+
+        <form action="/calculate" method="POST">
+
+            <label>Origin Address</label>
+            <input type="text" name="origin" placeholder="Street, City, State" required>
+
+            <label>Destination Address</label>
+            <input type="text" name="destination" placeholder="Street, City, State" required>
+
+            <label>Passengers</label>
+            <input type="number" name="passengers" value="1" min="1">
+
+
+
+            <button type="submit">Calculate Emissions</button>
+            
+
+
+        </form>
+
+            <button onclick="window.location.href='/manage-vehicles'">
+            Manage Vehicles
+        </button>
+    
+    </section>
+
+
+    <!-- MAP PANEL -->
+    <section class="map-panel">
+        <div id="map"></div>
+    </section>
+
+
+    <!-- RIGHT PANEL -->
+    <section class="right-panel">
+        <a href="/add-vehicle">
+            <button class="add-vehicle">
+                + Add Vehicle
+            </button>
+        </a>
+    </section>
+{% endblock %}
