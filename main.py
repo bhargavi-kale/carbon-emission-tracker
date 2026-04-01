@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     API_KEY = os.getenv("GOOGLE_API_KEY")
-    return render_template("index.html", API_KEY=API_KEY) #flaskstuff
+    return render_template("home.html", API_KEY=API_KEY) #flaskstuff
 
 
 
