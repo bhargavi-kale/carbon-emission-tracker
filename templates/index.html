@@ -15,8 +15,20 @@
 </header>
 
 
-<main class="container">
-    {% block content %}{% endblock %}
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    
 
 
 </main>
@@ -31,19 +43,35 @@
     <p>&copy; 2026 Bhargavi Kale, Isabella Velazquez-Abelardo | Carbon Commute Calculator </p>
 </footer>
 <script>
-function initMap() {
-    const center = { lat: 43.1339, lng: -70.9264 }; // UNH / Durham area
+    function initMap() {
+        const center = { lat: 43.1339, lng: -70.9264 }; // UNH / Durham area
 
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 12,
-        center: center,
-    });
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 12,
+            center: center,
+        });
 
-    new google.maps.Marker({
-        position: center,
-        map: map,
+        new google.maps.Marker({
+            position: center,
+            map: map,
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find all elements with the "alert" class
+        const alerts = document.querySelectorAll('.alert');
+        
+        alerts.forEach(function(alert) {
+            // Set a timer for 10000 milliseconds (10 seconds)
+            setTimeout(function() {
+                // Add a fade-out effect via CSS opacity
+                alert.style.transition = "opacity 0.6s ease";
+                alert.style.opacity = "0";
+                
+                // Remove the element from the DOM entirely after it fades
+                setTimeout(() => alert.remove(), 600);
+            }, 10000);
+        });
     });
-}
 </script>
 
 <script async
