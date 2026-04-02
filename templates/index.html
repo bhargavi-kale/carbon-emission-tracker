@@ -43,41 +43,72 @@
     <p>&copy; 2026 Bhargavi Kale, Isabella Velazquez-Abelardo | Carbon Commute Calculator </p>
 </footer>
 <script>
+let map;
+let directionsService;
+let directionsRenderer;
+
 function initMap() {
     const center = { lat: 43.1339, lng: -70.9264 };
-    const map = new google.maps.Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         zoom: 12,
         center: center,
     });
 
-        const form = document.querySelector("form");
-        form.addEventListener("submit", function(e) {
-        // Allow the form to submit to the server so the /calculate route can render
-        // the trip summary. The map directions will still be available on pages
-        // where JS runs after navigation.
-        const origin = form.origin.value;
-        const destination = form.destination.value;
-
-        const directionsService = new google.maps.DirectionsService();
-        const directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-
-        directionsService.route(
-            {
-                origin: origin,
-                destination: destination,
-                travelMode: google.maps.TravelMode.DRIVING,
-            },
-            (response, status) => {
-                if (status === "OK") {
-                    directionsRenderer.setDirections(response);
-                } else {
-                    alert("Directions request failed due to " + status);
-                }
-            }
-        );
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: false,
     });
+    directionsRenderer.setMap(map);
+
+    // Also attach a submit handler that will attempt to draw the route locally
+    // but does NOT prevent the normal form submission (server-side summary still runs).
+    const form = document.querySelector("form");
+    if (form) {
+        form.addEventListener("submit", function () {
+            const origin = form.origin.value;
+            const destination = form.destination.value;
+            // Try to render directions immediately so user sees the trail before the
+            // server round-trip finishes. This is best-effort and will not block the form.
+            if (origin && destination) {
+                renderDirections(origin, destination);
+            }
+        });
+    }
 }
+
+function renderDirections(origin, destination) {
+    if (!directionsService || !directionsRenderer) return;
+
+    directionsService.route(
+        {
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (response, status) => {
+            if (status === "OK") {
+                directionsRenderer.setDirections(response);
+            } else {
+                console.warn("Directions request failed:", status);
+            }
+        }
+    );
+}
+</script>
+
+{% if calculation %}
+<script>
+    // If server rendered a calculation, draw the directions on load using safe JSON
+    // injection so strings are escaped correctly.
+    window.addEventListener('load', function () {
+        const origin = {{ calculation.origin|tojson }};
+        const destination = {{ calculation.destination|tojson }};
+        if (typeof renderDirections === 'function') {
+            renderDirections(origin, destination);
+        }
+    });
+</script>
+{% endif %}
 </script>
 
 <script async

@@ -30,18 +30,14 @@
             <button type="submit">Calculate Emissions</button>
 
         </form>
+        
+        <a href="/add-vehicle">
+            <button class="add-vehicle">
+                + Add Vehicle
+            </button>
+        </a>
 
-            {% if calculation %}
-    <div class="calculation-results">
-        <h3>Trip Summary</h3>
-        <p><strong>Vehicle:</strong> {{ calculation.vehicle.make }} {{ calculation.vehicle.model }} ({{ calculation.vehicle.year }})</p>
-        <p><strong>Origin:</strong> {{ calculation.origin }}</p>
-        <p><strong>Destination:</strong> {{ calculation.destination }}</p>
-        <p><strong>Distance:</strong> {{ calculation.distance }} km</p>
-        <p><strong>Passengers:</strong> {{ calculation.passengers }}</p>
-        <p><strong>Estimated CO₂ Emissions:</strong> {{ calculation.emissions }} kg</p>
-    </div>
-    {% endif %}
+
 
 </section>
 
@@ -55,10 +51,16 @@
 
     <!-- RIGHT PANEL -->
     <section class="right-panel">
-        <a href="/add-vehicle">
-            <button class="add-vehicle">
-                + Add Vehicle
-            </button>
-        </a>
+            {% if calculation %}
+    <div class="calculation-results">
+        <h3>Trip Summary</h3>
+        <p><strong>Vehicle:</strong> {{ calculation.vehicle.make }} {{ calculation.vehicle.model }} ({{ calculation.vehicle.year }})</p>
+        <p><strong>Origin:</strong> {{ calculation.origin }}</p>
+        <p><strong>Destination:</strong> {{ calculation.destination }}</p>
+        <p><strong>Distance:</strong> {{ calculation.distance }} km</p>
+        <p><strong>Passengers:</strong> {{ calculation.passengers }}</p>
+        <p><strong>Estimated CO₂ Emissions:</strong> {{ calculation.emissions }} kg</p>
+    </div>
+    {% endif %}
     </section>
 {% endblock %}

@@ -1,47 +1,48 @@
+:root {
+    --primary-color: #464f41;
+    --accent-green: #7aa874;
+    --accent-green-dark: #5e8c5a;
+    --panel-bg: rgba(249, 242, 196, 0.85);
+    --panel-radius: 25px;
+    --content-width: 90%;
+    --max-width: 1400px;
+}
+
 body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    font-family: 'Consolas', monospace;
 }
 
-
-body.home-bg {
-    background-image: url("/static/background.png");
+/* background image only differs by image; shared properties applied via attribute selector */
+body[class$="-bg"] {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-body.vehicle-bg {
-    background-image: url("/static/background2.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
+body.home-bg { background-image: url("/static/background.png"); }
+body.vehicle-bg { background-image: url("/static/background2.png"); }
 
 header {
     text-align: center;
-    margin: 0px auto;
-    margin-bottom: 0px;
+    margin: 0 auto 0 auto;
     padding: 10px;
     width: 100%;
 }
 
 
 
-h1 {
-    font-size: 30px;
-    color: #464f41;
-    font-family: 'Consolas', monospace;
+h1, h2 {
+    color: var(--primary-color);
+    font-family: inherit;
 }
 
-h2 {
-    font-size: 24px;
-    color: #464f41;
-    font-family: 'Consolas', monospace;
-}
+h1 { font-size: 30px; }
+h2 { font-size: 24px; }
 
 
 
@@ -54,12 +55,9 @@ footer {
     padding: .5rem 0;
     max-width: 900px;
     color: #000000;
-    font-family: 'Consolas', monospace;
     font-weight: bold;
     background-color: rgba(249, 242, 196, 0.592);
     border-radius: 45px;
-
-    
 }
 
 
@@ -67,22 +65,18 @@ footer {
 .flowerfield {
     content: "";
     position: fixed;
-
     left: 50%;
     transform: translateX(-50%);
-    bottom: 0rem;
-
+    bottom: 0;
     width: 100%;
     height: 5rem;
-
     background-image: url("/static/flowerfield.gif");
     background-repeat: repeat-x;
     background-position: center bottom;
     background-size: contain;
-
-    z-index: -1;   
+    z-index: -1;
     pointer-events: none;
-} 
+}
 
 * {
     box-sizing: border-box;
@@ -93,9 +87,8 @@ footer {
     display: grid;
     grid-template-columns: 1fr 2fr 0.8fr;
     gap: 20px;
-
-    width: 90%;
-    max-width: 1400px;
+    width: var(--content-width);
+    max-width: var(--max-width);
     margin: auto;
     padding: 10px;
 }
@@ -106,10 +99,10 @@ footer {
 .left-panel,
 .right-panel,
 .map-panel {
-    background-color: rgba(249, 242, 196, 0.85);
-    border-radius: 25px;
-    margin-top: 0px;
-    padding: 5px 5px 5px 5px;
+    background-color: var(--panel-bg);
+    border-radius: var(--panel-radius);
+    margin-top: 0;
+    padding: 5px;
 }
 
 #map {
@@ -118,12 +111,18 @@ footer {
     border-radius: 20px;
 }
 
-input {
+/* form controls: inputs, selects, textareas share styles */
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: 14px;
     width: 100%;
-    margin-bottom: 10px;
     padding: 8px;
-    border-radius: 10px;
-    border: none;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 button {
@@ -131,28 +130,18 @@ button {
     padding: 10px;
     border-radius: 15px;
     border: none;
-    background-color: #7aa874;
+    background-color: var(--accent-green);
     color: white;
     font-weight: bold;
     cursor: pointer;
     margin-top: 10px;
 }
 
-button:hover {
-    background-color: #5e8c5a;
-}
+button:hover { background-color: var(--accent-green-dark); }
 
-.right-panel {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+.right-panel { display: flex; justify-content: center; align-items: center; }
 
-.add-vehicle {
-    height: 60px;
-    width: 140px;
-    font-size: 16px;
-}
+
 .alert {
     padding: 15px;
     margin-bottom: 20px;
@@ -187,63 +176,22 @@ button:hover {
 
 }
 
-.trip-form {
-    font-family: 'Consolas', monospace;
-}
+.trip-form,
+.vehicle-form { font-family: inherit; }
 
-/* labels */
-.trip-form label {
-    font-size: 15px;
-    color: #464f41;
-    display: block;
-    margin-top: 5px;
-}
-
-/* inputs */
-.trip-form input {
-    font-family: 'Consolas', monospace;
-    font-size: 12px;
-
-    width: 100%;
-    padding: 8px;
-    margin: 5px;
-
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-    /* VEHICLE FORM FONT + STYLE */
-
-.vehicle-form {
-    font-family: 'Consolas', monospace;
-}
-
-/* labels */
+/* labels for forms */
+.trip-form label,
 .vehicle-form label {
-    font-size: 16px;
-    color: #464f41;
-    display: block;
-    margin-top: 10px;
-}
-
-/* dropdown selects */
-.vehicle-form select {
-    font-family: 'Consolas', monospace;
     font-size: 15px;
-
-    width: 100%;
-    padding: 8px;
+    color: var(--primary-color);
+    display: block;
     margin-top: 5px;
-    margin-bottom: 10px;
-
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    background-color: white;
 }
 
-/* button spacing */
-.vehicle-form button {
-    margin-top: 15px;
-}
+/* small tweaks specific to vehicle form */
+.vehicle-form label { margin-top: 10px; font-size: 16px; }
+.vehicle-form select { margin-top: 5px; margin-bottom: 10px; background-color: white; }
+.vehicle-form button { margin-top: 15px; }
 
 
 
