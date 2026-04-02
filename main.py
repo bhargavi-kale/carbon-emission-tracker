@@ -45,8 +45,50 @@ df = pd.read_csv("data/vehicles.csv", low_memory=False)
 @app.route("/")
 def home():
     """Render the home page with the Google Maps API key."""
+    vehicles = Vehicle.query.all()  # Get all vehicles from DB
     api_key = os.getenv("GOOGLE_API_KEY")
-    return render_template("home.html", API_KEY=api_key)
+    return render_template("home.html", API_KEY=api_key, vehicles=vehicles)
+
+@app.route("/calculate", methods=["POST"])
+def calculate():
+    origin = request.form.get("origin")
+    destination = request.form.get("destination")
+    passengers = int(request.form.get("passengers", 1))
+
+    vehicle_id_str = request.form.get("vehicle_id")
+    if not vehicle_id_str:
+        flash("Please select a vehicle before calculating emissions.", "warning")
+        return redirect(url_for("home"))
+
+    try:
+        vehicle_id = int(vehicle_id_str)
+    except (ValueError, TypeError):
+        flash("Invalid vehicle selection.", "danger")
+        return redirect(url_for("home"))
+
+    vehicle = Vehicle.query.get(vehicle_id)
+    if vehicle is None:
+        flash("Selected vehicle not found. Please add or choose a valid vehicle.", "warning")
+        return redirect(url_for("home"))
+
+    # Example: calculate distance (you can integrate with Google Maps API)
+    distance_km = 10.5  # Replace with actual calculation
+    # Example CO2: let's say 0.2 kg per km per passenger
+    emissions = distance_km * 0.2 * passengers
+
+    calculation = {
+        "vehicle": vehicle,
+        "origin": origin,
+        "destination": destination,
+        "distance": distance_km,
+        "passengers": passengers,
+        "emissions": round(emissions, 2),
+    }
+
+    api_key = os.getenv("GOOGLE_API_KEY")
+    vehicles = Vehicle.query.all()  # Needed for the dropdown
+
+    return render_template("home.html", API_KEY=api_key, vehicles=vehicles, calculation=calculation)
 
 
 @app.route("/add-vehicle")
@@ -127,6 +169,7 @@ def get_vehicles():
 
     # jsonify converts the list into a JSON response
     return jsonify(vehicles_list)
+
 
 
 if __name__ == "__main__":

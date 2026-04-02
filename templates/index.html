@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
 <header>
     <h1>Carbon Commute Calculator</h1>
@@ -43,35 +43,41 @@
     <p>&copy; 2026 Bhargavi Kale, Isabella Velazquez-Abelardo | Carbon Commute Calculator </p>
 </footer>
 <script>
-    function initMap() {
-        const center = { lat: 43.1339, lng: -70.9264 }; // UNH / Durham area
-
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 12,
-            center: center,
-        });
-
-        new google.maps.Marker({
-            position: center,
-            map: map,
-        });
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-        // Find all elements with the "alert" class
-        const alerts = document.querySelectorAll('.alert');
-        
-        alerts.forEach(function(alert) {
-            // Set a timer for 10000 milliseconds (10 seconds)
-            setTimeout(function() {
-                // Add a fade-out effect via CSS opacity
-                alert.style.transition = "opacity 0.6s ease";
-                alert.style.opacity = "0";
-                
-                // Remove the element from the DOM entirely after it fades
-                setTimeout(() => alert.remove(), 600);
-            }, 10000);
-        });
+function initMap() {
+    const center = { lat: 43.1339, lng: -70.9264 };
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 12,
+        center: center,
     });
+
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function(e) {
+        // Allow the form to submit to the server so the /calculate route can render
+        // the trip summary. The map directions will still be available on pages
+        // where JS runs after navigation.
+        const origin = form.origin.value;
+        const destination = form.destination.value;
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        directionsService.route(
+            {
+                origin: origin,
+                destination: destination,
+                travelMode: google.maps.TravelMode.DRIVING,
+            },
+            (response, status) => {
+                if (status === "OK") {
+                    directionsRenderer.setDirections(response);
+                } else {
+                    alert("Directions request failed due to " + status);
+                }
+            }
+        );
+    });
+}
 </script>
 
 <script async
