@@ -59,17 +59,39 @@ def calculate():
 
     vehicle = Vehicle.query.get(vehicle_id)
 
-    # Example distance (later comes from Google Maps)
+    # --- Find vehicle in CSV dataset ---
+    match = df[
+        (df["make"] == vehicle.make) &
+        (df["model"] == vehicle.model) &
+        (df["year"] == vehicle.year)
+    ]
+
+    # Default fuel type
+    fuel_type = "Gasoline"
+
+    if not match.empty:
+        fuel_type = match.iloc[0]["fuelType"]
+
+    # --- Emission factors ---
+    emission_factors = {
+        "Gasoline": 0.20,
+        "Diesel": 0.18,
+        "Hybrid": 0.12,
+        "Electric": 0.05
+    }
+
+    factor = emission_factors.get(fuel_type, 0.20)
+
+    # Example distance (later from Google Maps API)
     distance_km = 10.5
 
-    # --- NEW EMISSIONS CALCULATION ---
-    emission_rate = 0.2  # kg CO2 per km
-
-    total_emissions = distance_km * emission_rate
+    # --- Emissions calculation ---
+    total_emissions = distance_km * factor
     emissions_per_person = total_emissions / passengers
 
     calculation = {
         "vehicle": vehicle,
+        "fuel_type": fuel_type,
         "origin": origin,
         "destination": destination,
         "distance": distance_km,
@@ -87,7 +109,6 @@ def calculate():
         vehicles=vehicles,
         calculation=calculation
     )
-
 
 @app.route("/add-vehicle")
 def add_vehicle():
