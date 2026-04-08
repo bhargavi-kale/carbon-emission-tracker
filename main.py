@@ -8,11 +8,11 @@ import pandas as pd
 from dotenv import load_dotenv
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 
-from models import db, Vehicle
+from models import db, VehicleModel
 
 # from src.route import Route
 # from src.trip import Trip
-# from src.vehicle import Vehicle
+from src.vehicle import Vehicle
 
 # Load environment variables
 load_dotenv()
@@ -45,19 +45,19 @@ df = pd.read_csv("data/vehicles.csv", low_memory=False)
 @app.route("/")
 def home():
     """Render the home page with the Google Maps API key."""
-    vehicles = Vehicle.query.all()  # Get all vehicles from DB
+    vehicles = VehicleModel.query.all()  # Get all vehicles from DB
     api_key = os.getenv("GOOGLE_API_KEY")
     return render_template("home.html", API_KEY=api_key, vehicles=vehicles)
 
 @app.route("/calculate", methods=["POST"])
 def calculate():
-
+    """Handle form submission to calculate emissions for a commute."""
     origin = request.form.get("origin")
     destination = request.form.get("destination")
     passengers = int(request.form.get("passengers", 1))
     vehicle_id = int(request.form.get("vehicle_id"))
 
-    vehicle = Vehicle.query.get(vehicle_id)
+    vehicle = VehicleModel.query.get(vehicle_id)
 
     # --- Find vehicle in CSV dataset ---
     match = df[
@@ -101,7 +101,7 @@ def calculate():
     }
 
     api_key = os.getenv("GOOGLE_API_KEY")
-    vehicles = Vehicle.query.all()
+    vehicles = VehicleModel.query.all()
 
     return render_template(
         "home.html",
@@ -125,7 +125,7 @@ def save_vehicle():
     year = int(request.form.get("year"))
 
     # Check if this exact vehicle already exists in the database
-    existing_vehicle = Vehicle.query.filter_by(
+    existing_vehicle = VehicleModel.query.filter_by(
         make=make, model=model, year=year
     ).first()
     print(existing_vehicle, "existing vehicle")
@@ -135,10 +135,13 @@ def save_vehicle():
         print("existing vehicle here")
         flash(f"Note: {make} {model} ({year}) is already in your list!", "info")
         return redirect(url_for("home"))
-
+    economy_data = Vehicle.fetch_economy_data(make, model, year)
     # If it doesn't exist, proceed with saving
     try:
-        new_vehicle = Vehicle(make=make, model=model, year=year)
+        new_vehicle = VehicleModel(make=make, model=model, year=year,
+                              economy_id=int(economy_data["id"]),
+                              fuel_type=economy_data["fuelType1"],
+                              combined_mpg=float(economy_data["comb08"]))
         db.session.add(new_vehicle)
         db.session.commit()
         print(new_vehicle, "new vehicle")
@@ -171,7 +174,7 @@ def get_years(make, model):
 @app.route("/api/vehicles")
 def get_vehicles():
     """API endpoint to retrieve all vehicles in the database as JSON."""
-    all_vehicles = Vehicle.query.all()
+    all_vehicles = VehicleModel.query.all()
 
     # Convert the database objects into a list of dictionaries
     vehicles_list = []
