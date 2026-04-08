@@ -83,7 +83,8 @@ def calculate():
     factor = emission_factors.get(fuel_type, 0.20)
 
     # Example distance (later from Google Maps API)
-    distance_km = calculate_distance(origin, destination) * 1.60934  # Convert miles to kilometers
+    distance_miles = calculate_distance(origin, destination)  # Placeholder function
+    distance_km = distance_miles * 1.60934 # Convert miles to kilometers
 
     # --- Emissions calculation ---
     total_emissions = distance_km * factor
@@ -94,7 +95,8 @@ def calculate():
         "fuel_type": fuel_type,
         "origin": origin,
         "destination": destination,
-        "distance": distance_km,
+        "distance_miles": round(distance_miles, 2),
+        "distance_km": round(distance_km, 2),
         "passengers": passengers,
         "total_emissions": round(total_emissions, 2),
         "emissions_per_person": round(emissions_per_person, 2),
