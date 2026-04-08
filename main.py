@@ -10,7 +10,7 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, f
 
 from models import db, VehicleModel
 
-# from src.route import Route
+from src.route import calculate_distance
 # from src.trip import Trip
 from src.vehicle import Vehicle
 
@@ -83,7 +83,7 @@ def calculate():
     factor = emission_factors.get(fuel_type, 0.20)
 
     # Example distance (later from Google Maps API)
-    distance_km = 10.5
+    distance_km = calculate_distance(origin, destination) * 1.60934  # Convert miles to kilometers
 
     # --- Emissions calculation ---
     total_emissions = distance_km * factor
