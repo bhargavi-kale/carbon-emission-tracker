@@ -57,7 +57,7 @@ def calculate():
     passengers = int(request.form.get("passengers", 1))
     vehicle_id = int(request.form.get("vehicle_id"))
 
-    vehicle = VehicleModel.query.get(vehicle_id)
+    vehicle = db.session.get(VehicleModel, vehicle_id)
 
     # --- Find vehicle in CSV dataset ---
     match = df[
