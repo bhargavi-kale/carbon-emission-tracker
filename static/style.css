@@ -10,7 +10,7 @@
 
 * { box-sizing: border-box; }
 
-/* 1. VIEWPORT ENGINE - Prevents the global page scroll on laptops */
+/* 1. VIEWPORT ENGINE - Keeps the app contained to the screen on laptops */
 body {
     margin: 0;
     height: 100vh;
@@ -21,7 +21,6 @@ body {
     font-family: 'Consolas', monospace;
 }
 
-/* Original background images without any filters/blur */
 body.home-bg { background-image: url("/static/background.png"); background-size: cover; background-position: center; }
 body.vehicle-bg { background-image: url("/static/background2.png"); background-size: cover; background-position: center; }
 
@@ -37,19 +36,17 @@ main {
     min-height: 0; 
 }
 
-/* 2. ADJUSTED WIDTH GRID SYSTEM */
+/* 2. LAYOUT TYPE A: 3-COLUMN DASHBOARD (Large Desktop > 1200px) */
 .container {
     display: grid;
-    /* Fixed widths for side panels as previously adjusted, map takes the rest */
-    grid-template-columns: 340px 1fr 310px;
+    grid-template-columns: 330px 1fr 340px;
     gap: 20px;
     width: var(--content-width);
     max-width: var(--max-width);
-    height: 90%; 
+    height: 92%; 
     margin: 0 auto;
 }
 
-/* Panels use your original background color and radius */
 .left-panel, .right-panel, .map-panel {
     background-color: var(--panel-bg);
     border-radius: var(--panel-radius);
@@ -57,45 +54,24 @@ main {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.left-panel, .right-panel {
-    overflow-y: auto; /* Internal scrolling if the form is tall */
-}
-
-.map-panel {
-    display: flex;
-    flex-direction: column;
-}
-
+.left-panel, .right-panel { overflow-y: auto; }
+.map-panel { display: flex; flex-direction: column; }
 #map { flex: 1; width: 100%; min-height: 300px; border-radius: 20px; }
 
-/* 3. FORM ELEMENTS - Original Styles */
+/* 3. FORM ELEMENTS */
 label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); }
 input, select { 
-    width: 100%; 
-    padding: 8px; 
-    margin-bottom: 10px; 
-    border: 1px solid #ccc; 
-    border-radius: 8px; 
-    font-family: inherit;
+    width: 100%; padding: 8px; margin-bottom: 10px; 
+    border: 1px solid #ccc; border-radius: 8px; font-family: inherit;
 }
-
 button { 
-    width: 100%; 
-    padding: 10px; 
-    border-radius: 15px; 
-    border: none; 
-    background-color: var(--accent-green); 
-    color: white; 
-    font-weight: bold; 
-    cursor: pointer; 
+    width: 100%; padding: 10px; border-radius: 15px; border: none; 
+    background-color: var(--accent-green); color: white; font-weight: bold; cursor: pointer; 
 }
 button:hover { background-color: var(--accent-green-dark); }
-
 .add-vehicle {
-    background: transparent !important;
-    color: var(--accent-green) !important;
-    border: 2px solid var(--accent-green) !important;
-    margin-top: 10px !important;
+    background: transparent !important; color: var(--accent-green) !important;
+    border: 2px solid var(--accent-green) !important; margin-top: 10px !important;
 }
 
 /* 4. FOOTER & DECORATION */
@@ -113,40 +89,49 @@ button:hover { background-color: var(--accent-green-dark); }
     z-index: 1;
     pointer-events: none;
 }
-
 footer { 
-    padding: 10px; 
-    text-align: center; 
-    font-size: 0.8rem; 
-    color: #000; 
-    font-weight: bold;
-    background-color: rgba(249, 242, 196, 0.7); /* Original footer bg */
-    border-radius: 45px;
-    width: fit-content;
-    margin: 5px auto 20px auto;
-    position: relative;
-    z-index: 2;
+    padding: 10px; text-align: center; font-size: 0.8rem; color: #000; font-weight: bold;
+    background-color: rgba(249, 242, 196, 0.7); border-radius: 45px;
+    width: fit-content; margin: 5px auto 20px auto; position: relative; z-index: 2;
 }
 
-/* 5. TABLET RESPONSIVENESS (Mid-size) */
-@media (max-width: 1200px) and (min-width: 769px) {
-    .container {
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto 1fr;
-        height: 95%;
-    }
-    .map-panel { grid-column: span 2; height: 400px; }
-}
-
-/* 6. MOBILE RESPONSIVENESS (Phones) */
-@media (max-width: 768px) {
+/* 5. LAYOUT TYPE B: 2-COLUMN HYBRID (901px - 1200px) */
+/* @media (max-width: 1200px) and (min-width: 901px) {
     body { overflow-y: auto; height: auto; }
     .container {
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
         height: auto;
         padding-bottom: 80px;
     }
-    .map-panel { order: -1; height: 350px; flex-shrink: 0; }
+    .map-panel { grid-column: span 2; height: 450px; } 
+    .left-panel { grid-row: 2; }
+    .right-panel { grid-row: 2; }
+} */
+
+/* 6. LAYOUT TYPE C: 2-COLUMN STACKED (731px - 900px) */
+/* Prioritizes the "Plan" and "Summary" at the top before the Map */
+@media (max-width: 1100px) and (min-width: 731px) {
+    body { overflow-y: auto; height: auto; }
+    .container {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+    }
+    .left-panel { grid-column: 1; grid-row: 1; }
+    .right-panel { grid-column: 2; grid-row: 1; }
+    .map-panel { grid-column: span 2; grid-row: 2; height: 400px; }
+}
+
+/* 7. MOBILE FIX (730px and below) - ONE COLUMN */
+@media (max-width: 730px) {
+    body { overflow-y: auto; height: auto; }
+    .container {
+        display: flex;
+        flex-direction: column; 
+        height: auto;
+        padding-bottom: 80px;
+    }
+    .map-panel { height: 350px; flex-shrink: 0; }
     #map { height: 100%; }
 }
