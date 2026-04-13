@@ -11,5 +11,5 @@ pylint==3.3.4
 mypy==1.14.1
 
 # Flask/SQLAlchemy type stubs (needed by mypy)
-flask-stubs==0.1.0
+types-Flask
 sqlalchemy[mypy]==2.0.37
