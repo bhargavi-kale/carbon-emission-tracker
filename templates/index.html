@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
 <header>
     <h1>Carbon Commute Calculator</h1>
@@ -43,35 +43,72 @@
     <p>&copy; 2026 Bhargavi Kale, Isabella Velazquez-Abelardo | Carbon Commute Calculator </p>
 </footer>
 <script>
-    function initMap() {
-        const center = { lat: 43.1339, lng: -70.9264 }; // UNH / Durham area
+let map;
+let directionsService;
+let directionsRenderer;
 
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 12,
-            center: center,
-        });
+function initMap() {
+    const center = { lat: 43.1339, lng: -70.9264 };
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 12,
+        center: center,
+    });
 
-        new google.maps.Marker({
-            position: center,
-            map: map,
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: false,
+    });
+    directionsRenderer.setMap(map);
+
+    // Also attach a submit handler that will attempt to draw the route locally
+    // but does NOT prevent the normal form submission (server-side summary still runs).
+    const form = document.querySelector("form");
+    if (form) {
+        form.addEventListener("submit", function () {
+            const origin = form.origin.value;
+            const destination = form.destination.value;
+            // Try to render directions immediately so user sees the trail before the
+            // server round-trip finishes. This is best-effort and will not block the form.
+            if (origin && destination) {
+                renderDirections(origin, destination);
+            }
         });
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        // Find all elements with the "alert" class
-        const alerts = document.querySelectorAll('.alert');
-        
-        alerts.forEach(function(alert) {
-            // Set a timer for 10000 milliseconds (10 seconds)
-            setTimeout(function() {
-                // Add a fade-out effect via CSS opacity
-                alert.style.transition = "opacity 0.6s ease";
-                alert.style.opacity = "0";
-                
-                // Remove the element from the DOM entirely after it fades
-                setTimeout(() => alert.remove(), 600);
-            }, 10000);
-        });
+}
+
+function renderDirections(origin, destination) {
+    if (!directionsService || !directionsRenderer) return;
+
+    directionsService.route(
+        {
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (response, status) => {
+            if (status === "OK") {
+                directionsRenderer.setDirections(response);
+            } else {
+                console.warn("Directions request failed:", status);
+            }
+        }
+    );
+}
+</script>
+
+{% if calculation %}
+<script>
+    // If server rendered a calculation, draw the directions on load using safe JSON
+    // injection so strings are escaped correctly.
+    window.addEventListener('load', function () {
+        const origin = {{ calculation.origin|tojson }};
+        const destination = {{ calculation.destination|tojson }};
+        if (typeof renderDirections === 'function') {
+            renderDirections(origin, destination);
+        }
     });
+</script>
+{% endif %}
 </script>
 
 <script async

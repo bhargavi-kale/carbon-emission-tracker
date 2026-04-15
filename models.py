@@ -17,7 +17,7 @@ db = SQLAlchemy()
 # ---------------------------------------------------------------------------
 
 
-class Vehicle(db.Model):
+class VehicleModel(db.Model):
     """ORM model representing a vehicle.
 
     :ivar id: Primary key.
@@ -30,7 +30,12 @@ class Vehicle(db.Model):
     make = db.Column(db.String(50), nullable=False)
     model = db.Column(db.String(50), nullable=False)
     year = db.Column(db.Integer, nullable=False)
-
+    economy_id = db.Column(db.Integer)
+    fuel_type = db.Column(db.String(50))
+    # city_mpg = db.Column(db.Float)
+    # highway_mpg = db.Column(db.Float)
+    ## The real-world situation is mostly a combination of city and highway driving, so we will use combined MPG for our calculations.
+    combined_mpg = db.Column(db.Float)## The real-world situation is mostly a combination of city and highway driving, so we will use combined MPG for our calculations.
     def to_dict(self) -> dict:
         """Convert the Vehicle object into a dictionary."""
         return {
@@ -38,6 +43,8 @@ class Vehicle(db.Model):
             "make": self.make,
             "model": self.model,
             "year": self.year,
+            "fuel_type": self.fuel_type,
+            "combined_mpg": self.combined_mpg,
         }
 
 
@@ -78,13 +85,13 @@ class Trip(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'), nullable=False)
-    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle.id'), nullable=False)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicle_model.id'), nullable=False)
     frequency = db.Column(db.Integer, default=0, nullable=False)
     occurrence = db.Column(db.Integer, default=1, nullable=False)
     passengers = db.Column(db.Integer, default=1, nullable=False)
 
     route = db.relationship("Route", backref=db.backref("trips", lazy=True))
-    vehicle = db.relationship("Vehicle", backref=db.backref("trips", lazy=True))
+    vehicle = db.relationship("VehicleModel", backref=db.backref("trips", lazy=True))
 
     def to_dict(self) -> dict:
         """Convert the Trip object into a dictionary, including related Route and Vehicle data."""
@@ -96,3 +103,4 @@ class Trip(db.Model):
             "occurrence": self.occurrence,
             "passengers": self.passengers,
         }
+

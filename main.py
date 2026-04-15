@@ -8,11 +8,11 @@ import pandas as pd
 from dotenv import load_dotenv
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 
-from models import db, Vehicle
+from models import db, VehicleModel
 
-# from src.route import Route
+from src.route import calculate_distance
 # from src.trip import Trip
-# from src.vehicle import Vehicle
+from src.vehicle import Vehicle
 
 # Load environment variables
 load_dotenv()
@@ -45,9 +45,72 @@ df = pd.read_csv("data/vehicles.csv", low_memory=False)
 @app.route("/")
 def home():
     """Render the home page with the Google Maps API key."""
+    vehicles = VehicleModel.query.all()  # Get all vehicles from DB
     api_key = os.getenv("GOOGLE_API_KEY")
-    return render_template("home.html", API_KEY=api_key)
+    return render_template("home.html", API_KEY=api_key, vehicles=vehicles)
 
+@app.route("/calculate", methods=["POST"])
+def calculate():
+    """Handle form submission to calculate emissions for a commute."""
+    origin = request.form.get("origin")
+    destination = request.form.get("destination")
+    passengers = int(request.form.get("passengers", 1))
+    vehicle_id = int(request.form.get("vehicle_id"))
+
+    vehicle = db.session.get(VehicleModel, vehicle_id)
+
+    # --- Find vehicle in CSV dataset ---
+    match = df[
+        (df["make"] == vehicle.make) &
+        (df["model"] == vehicle.model) &
+        (df["year"] == vehicle.year)
+    ]
+
+    # Default fuel type
+    fuel_type = "Gasoline"
+
+    if not match.empty:
+        fuel_type = match.iloc[0]["fuelType"]
+
+    # --- Emission factors ---
+    emission_factors = {
+        "Gasoline": 0.20,
+        "Diesel": 0.18,
+        "Hybrid": 0.12,
+        "Electric": 0.05
+    }
+
+    factor = emission_factors.get(fuel_type, 0.20)
+
+    # Example distance (later from Google Maps API)
+    distance_miles = calculate_distance(origin, destination)  # Placeholder function
+    distance_km = distance_miles * 1.60934 # Convert miles to kilometers
+
+    # --- Emissions calculation ---
+    total_emissions = distance_km * factor
+    emissions_per_person = total_emissions / passengers
+
+    calculation = {
+        "vehicle": vehicle,
+        "fuel_type": fuel_type,
+        "origin": origin,
+        "destination": destination,
+        "distance_miles": round(distance_miles, 2),
+        "distance_km": round(distance_km, 2),
+        "passengers": passengers,
+        "total_emissions": round(total_emissions, 2),
+        "emissions_per_person": round(emissions_per_person, 2),
+    }
+
+    api_key = os.getenv("GOOGLE_API_KEY")
+    vehicles = VehicleModel.query.all()
+
+    return render_template(
+        "home.html",
+        API_KEY=api_key,
+        vehicles=vehicles,
+        calculation=calculation
+    )
 
 @app.route("/add-vehicle")
 def add_vehicle():
@@ -64,7 +127,7 @@ def save_vehicle():
     year = int(request.form.get("year"))
 
     # Check if this exact vehicle already exists in the database
-    existing_vehicle = Vehicle.query.filter_by(
+    existing_vehicle = VehicleModel.query.filter_by(
         make=make, model=model, year=year
     ).first()
     print(existing_vehicle, "existing vehicle")
@@ -74,10 +137,13 @@ def save_vehicle():
         print("existing vehicle here")
         flash(f"Note: {make} {model} ({year}) is already in your list!", "info")
         return redirect(url_for("home"))
-
+    economy_data = Vehicle.fetch_economy_data(make, model, year)
     # If it doesn't exist, proceed with saving
     try:
-        new_vehicle = Vehicle(make=make, model=model, year=year)
+        new_vehicle = VehicleModel(make=make, model=model, year=year,
+                              economy_id=int(economy_data["id"]),
+                              fuel_type=economy_data["fuelType1"],
+                              combined_mpg=float(economy_data["comb08"]))
         db.session.add(new_vehicle)
         db.session.commit()
         print(new_vehicle, "new vehicle")
@@ -110,7 +176,7 @@ def get_years(make, model):
 @app.route("/api/vehicles")
 def get_vehicles():
     """API endpoint to retrieve all vehicles in the database as JSON."""
-    all_vehicles = Vehicle.query.all()
+    all_vehicles = VehicleModel.query.all()
 
     # Convert the database objects into a list of dictionaries
     vehicles_list = []
@@ -127,6 +193,7 @@ def get_vehicles():
 
     # jsonify converts the list into a JSON response
     return jsonify(vehicles_list)
+
 
 
 if __name__ == "__main__":

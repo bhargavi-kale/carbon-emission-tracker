@@ -1,10 +1,14 @@
 {% extends "index.html" %}
 
+{% block body_class %}vehicle-bg{% endblock %}
+
+
+
 {% block content %}
 <section class="left-panel">
     <h2>Add your Vehicle</h2>
 
-    <form action="/save-vehicle" method="POST">
+    <form action="/save-vehicle" method="POST" class="vehicle-form">
         <label>Vehicle Make</label>
         <select id="make_select" name="make" required>
             <option value="">Select a Make</option>

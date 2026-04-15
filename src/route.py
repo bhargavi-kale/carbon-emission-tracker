@@ -97,3 +97,22 @@ class Route:
             Distance in miles.
         """
         return meters * 0.000621371
+
+   
+def calculate_distance(origin: str, destination: str) -> float:
+    """Calculate distance between two locations using the Route class.
+
+    Parameters
+    ----------
+    origin : str
+        The starting address or location identifier.
+    destination : str
+        The destination address or location identifier.
+
+    Returns
+    -------
+    float
+        The distance for the route in miles.
+    """
+    route = Route(origin, destination)
+    return route.fetch_route_data()

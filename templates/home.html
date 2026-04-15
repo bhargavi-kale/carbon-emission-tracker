@@ -1,11 +1,11 @@
 {% extends "index.html" %}
 
-
+{% block body_class %}home-bg{% endblock %}
 {% block content %}
     <section class="left-panel">
         <h2>Plan Your Trip</h2>
 
-        <form action="/calculate" method="POST">
+        <form action="/calculate" method="POST" class="trip-form">
 
             <label>Origin Address</label>
             <input type="text" name="origin" placeholder="Street, City, State" required>
@@ -16,20 +16,32 @@
             <label>Passengers</label>
             <input type="number" name="passengers" value="1" min="1">
 
+            <label>Select Vehicle</label>
+
+            <select name="vehicle_id" required class="vehicle-select">
+                <option value="">-- Choose a vehicle --</option>
+                {% for v in vehicles %}
+                 <option value="{{ v.id }}">{{ v.make }} {{ v.model }} ({{ v.year }})</option>
+                {% endfor %}
+            </select>
+
 
 
             <button type="submit">Calculate Emissions</button>
-            
-
 
         </form>
+        
+        <a href="/add-vehicle">
+            <button class="add-vehicle">
+                + Add Vehicle
+            </button>
+        </a>
 
-            <button onclick="window.location.href='/manage-vehicles'">
-            Manage Vehicles
-        </button>
-    
-    </section>
 
+
+</section>
+
+ 
 
     <!-- MAP PANEL -->
     <section class="map-panel">
@@ -39,10 +51,32 @@
 
     <!-- RIGHT PANEL -->
     <section class="right-panel">
-        <a href="/add-vehicle">
-            <button class="add-vehicle">
-                + Add Vehicle
-            </button>
-        </a>
+            {% if calculation %}
+<div class="calculation-results">
+    <h3>Trip Summary</h3>
+
+    <p><strong>Vehicle:</strong>
+        {{ calculation.vehicle.make }}
+        {{ calculation.vehicle.model }}
+        ({{ calculation.vehicle.year }})
+    </p>
+    <p><strong>Fuel Type:</strong> {{ calculation.fuel_type }}</p>
+    <p><strong>Origin:</strong> {{ calculation.origin }}</p>
+    <p><strong>Destination:</strong> {{ calculation.destination }}</p>
+
+    <p><strong>Distance:</strong> {{ calculation.distance_miles }} miles ({{ calculation.distance_km }} km)</p>
+    <p><strong>Passengers:</strong> {{ calculation.passengers }}</p>
+
+    <hr>
+
+    <p><strong>Total Trip Emissions:</strong>
+        {{ calculation.total_emissions }} kg CO₂
+    </p>
+
+    <p><strong>Emissions Per Passenger:</strong>
+        {{ calculation.emissions_per_person }} kg CO₂
+    </p>
+</div>
+    {% endif %}
     </section>
 {% endblock %}
