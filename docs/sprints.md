@@ -25,3 +25,29 @@
 ## What tangible work products will evidence your work?
 - New dashboard HTML file  
 - Updates in existing `main.py` file and HTML files  
+
+
+# Sprint-2 Bhargavi Kale
+
+## What project work have you achieved since last class last week?
+- Worked on documentation and updated the README.md file  
+
+## What challenges, setbacks, or blockers have you encountered?
+- No major challenges.
+
+## What is your actionable and feasible plan for this week’s sprint?
+- Test different edge cases of the application.
+- Work on deployment
+
+## How much time are you allocated for this sprint? When?
+- Sunday and Tuesday (4–5 hours)  
+
+## What specific activities/tasks will you do in the allocated time?
+- Test the application in different scenarios and fix issues
+- Prepare presentation
+- Deploy the application
+
+## What tangible work products will evidence your work?
+- Updates in existing main.py file and HTML files
+- Updates in docs folder with presentation file
+
