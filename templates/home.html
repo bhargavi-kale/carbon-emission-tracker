@@ -2,6 +2,7 @@
 
 {% block body_class %}home-bg{% endblock %}
 {% block content %}
+<div class="container">
     <section class="left-panel">
         <h2>Plan Your Trip</h2>
 
@@ -76,7 +77,11 @@
     <p><strong>Emissions Per Passenger:</strong>
         {{ calculation.emissions_per_person }} kg CO₂
     </p>
+    <a href="/dashboard">
+        <button class="dashboard-btn">View Dashboard</button>
+    </a>
 </div>
     {% endif %}
     </section>
+</div>
 {% endblock %}
