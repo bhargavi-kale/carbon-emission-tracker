@@ -103,4 +103,20 @@ class Trip(db.Model):
             "occurrence": self.occurrence,
             "passengers": self.passengers,
         }
+class Commute(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    vehicle_name = db.Column(db.String(120))
+    fuel_type = db.Column(db.String(50))
+
+    origin = db.Column(db.String(200))
+    destination = db.Column(db.String(200))
+
+    distance_miles = db.Column(db.Float)
+    distance_km = db.Column(db.Float)
+
+    passengers = db.Column(db.Integer)
+
+    total_emissions = db.Column(db.Float)
+    emissions_per_person = db.Column(db.Float)
 

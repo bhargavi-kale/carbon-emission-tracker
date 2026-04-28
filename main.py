@@ -1,17 +1,17 @@
 """
-Main application module for the Carbom Commute System.
+Main application module for the Carbon Commute System.
 Handles routing for vehicle data and integration with Google Maps API.
 """
 
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
+from flask import (
+    Flask, render_template, jsonify, request, redirect, url_for
+)
 
-from models import db, VehicleModel
-
+from models import db, VehicleModel, Commute
 from src.route import calculate_distance
-# from src.trip import Trip
 from src.vehicle import Vehicle
 
 # Load environment variables
@@ -36,6 +36,7 @@ def create_app():
 
     return flask_app
 
+
 app = create_app()
 
 # Load dataset
@@ -48,6 +49,7 @@ def home():
     vehicles = VehicleModel.query.all()  # Get all vehicles from DB
     api_key = os.getenv("GOOGLE_API_KEY")
     return render_template("home.html", API_KEY=api_key, vehicles=vehicles)
+
 
 @app.route("/calculate", methods=["POST"])
 def calculate():
@@ -83,12 +85,27 @@ def calculate():
     factor = emission_factors.get(fuel_type, 0.20)
 
     # Example distance (later from Google Maps API)
-    distance_miles = calculate_distance(origin, destination)  # Placeholder function
-    distance_km = distance_miles * 1.60934 # Convert miles to kilometers
+    distance_miles = calculate_distance(origin, destination)
+    distance_km = distance_miles * 1.60934  # Convert miles to kilometers
 
     # --- Emissions calculation ---
     total_emissions = distance_km * factor
     emissions_per_person = total_emissions / passengers
+
+    commute = Commute(
+        vehicle_name=f"{vehicle.make} {vehicle.model} ({vehicle.year})",
+        fuel_type=fuel_type,
+        origin=origin,
+        destination=destination,
+        distance_miles=distance_miles,
+        distance_km=distance_km,
+        passengers=passengers,
+        total_emissions=total_emissions,
+        emissions_per_person=emissions_per_person
+    )
+
+    db.session.add(commute)
+    db.session.commit()
 
     calculation = {
         "vehicle": vehicle,
@@ -112,6 +129,7 @@ def calculate():
         calculation=calculation
     )
 
+
 @app.route("/add-vehicle")
 def add_vehicle():
     """Render the vehicle selection page with sorted manufacturer list."""
@@ -126,32 +144,22 @@ def save_vehicle():
     model = request.form.get("model")
     year = int(request.form.get("year"))
 
-    # Check if this exact vehicle already exists in the database
-    existing_vehicle = VehicleModel.query.filter_by(
-        make=make, model=model, year=year
-    ).first()
-    print(existing_vehicle, "existing vehicle")
-
-    if existing_vehicle:
-        # Inform the user it's already there
-        print("existing vehicle here")
-        flash(f"Note: {make} {model} ({year}) is already in your list!", "info")
-        return redirect(url_for("home"))
     economy_data = Vehicle.fetch_economy_data(make, model, year)
     # If it doesn't exist, proceed with saving
     try:
-        new_vehicle = VehicleModel(make=make, model=model, year=year,
-                              economy_id=int(economy_data["id"]),
-                              fuel_type=economy_data["fuelType1"],
-                              combined_mpg=float(economy_data["comb08"]))
+        new_vehicle = VehicleModel(
+            make=make,
+            model=model,
+            year=year,
+            economy_id=int(economy_data["id"]),
+            fuel_type=economy_data["fuelType1"],
+            combined_mpg=float(economy_data["comb08"])
+        )
         db.session.add(new_vehicle)
         db.session.commit()
-        print(new_vehicle, "new vehicle")
-        flash(f"Success! {make} {model} added.", "success")
-    except Exception as e:
+    except ValueError as e:
         print("Error saving vehicle:", e)
         db.session.rollback()
-        flash("An error occurred while saving.", "danger")
 
     return redirect(url_for("home"))
 
@@ -167,10 +175,27 @@ def get_models(make):
 def get_years(make, model):
     """Return a JSON list of available years for a specific make and model."""
     years = sorted(
-        df[(df["make"] == make) & (df["model"] == model)]["year"].unique().tolist(),
+        df[
+            (df["make"] == make) & (df["model"] == model)
+        ]["year"].unique().tolist(),
         reverse=True,
     )
     return jsonify([int(y) for y in years])
+
+
+@app.route("/dashboard")
+def dashboard():
+    commutes = Commute.query.all()
+
+    total_distance = sum(c.distance_km for c in commutes)
+    total_emissions = sum(c.total_emissions for c in commutes)
+
+    return render_template(
+        "dashboard.html",
+        commutes=commutes,
+        total_distance=round(total_distance, 2),
+        total_emissions=round(total_emissions, 2)
+    )
 
 
 @app.route("/api/vehicles")
@@ -187,14 +212,14 @@ def get_vehicles():
                 "make": vehicle.make,
                 "model": vehicle.model,
                 # 'fuel_type': vehicle.fuel_type,
-                # 'efficiency': vehicle.efficiency  # grams of CO2 per mile/km
+                # 'efficiency': vehicle.efficiency  # grams CO2/mi/km
             }
         )
-
-    # jsonify converts the list into a JSON response
     return jsonify(vehicles_list)
 
 
+if __name__ == "__main__":
+    app.run(debug=True)
 
 if __name__ == "__main__":
     app.run(debug=True)

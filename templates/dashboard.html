@@ -1,0 +1,48 @@
+{% extends "index.html" %}
+
+{% block body_class %}dashboard-bg{% endblock %}
+{% block content %}
+<section class="dashboard-container">
+
+
+
+    <div class="dashboard-table-wrapper">
+        <h2>Trip History</h2>
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Vehicle</th>
+                    <th>Fuel Type</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Distance (km)</th>
+                    <th>Total CO₂ (kg)</th>
+                    <th>Per Person (kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for commute in commutes %}
+                <tr>
+                    <td>{{ commute.vehicle_name }}</td>
+                    <td>{{ commute.fuel_type }}</td>
+                    <td>{{ commute.origin }}</td>
+                    <td>{{ commute.destination }}</td>
+                    <td>{{ commute.distance_km }}</td>
+                    <td>{{ commute.total_emissions }}</td>
+                    <td>{{ commute.emissions_per_person }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not commutes %}
+        <p class="no-data">No commutes recorded yet. <a href="/">Calculate your first commute!</a></p>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-footer">
+        <a href="/">
+            <button class="back-btn">← Back to Calculator</button>
+        </a>
+    </div>
+</section>
+{% endblock %}
