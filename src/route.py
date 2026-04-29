@@ -77,11 +77,12 @@ class Route:
         }
 
         response = requests.post(url, headers=headers, data=json.dumps(body))
-
         data = response.json()
-        distance_meters = data["routes"][0]["distanceMeters"]
-        self.distance = self.meters_to_miles(distance_meters)
-        return self.distance
+        if "routes" in data and len(data["routes"]) > 0:
+            distance_meters = data["routes"][0]["distanceMeters"]
+            self.distance = self.meters_to_miles(distance_meters)
+            return self.distance
+        return None
 
     def meters_to_miles(self, meters: float) -> float:
         """Convert meters to miles.

@@ -6,13 +6,12 @@ Handles routing for vehicle data and integration with Google Maps API.
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from flask import (
-    Flask, render_template, jsonify, request, redirect, url_for
-)
+from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 
 from models import db, VehicleModel, Commute
 from src.route import calculate_distance
 from src.vehicle import Vehicle
+from src.trip import calculate_emissions
 
 # Load environment variables
 load_dotenv()
@@ -61,35 +60,25 @@ def calculate():
 
     vehicle = db.session.get(VehicleModel, vehicle_id)
 
-    # --- Find vehicle in CSV dataset ---
-    match = df[
-        (df["make"] == vehicle.make) &
-        (df["model"] == vehicle.model) &
-        (df["year"] == vehicle.year)
-    ]
-
     # Default fuel type
     fuel_type = "Gasoline"
-
-    if not match.empty:
-        fuel_type = match.iloc[0]["fuelType"]
-
-    # --- Emission factors ---
-    emission_factors = {
-        "Gasoline": 0.20,
-        "Diesel": 0.18,
-        "Hybrid": 0.12,
-        "Electric": 0.05
-    }
-
-    factor = emission_factors.get(fuel_type, 0.20)
+    mpg = 20
+    if vehicle:
+        fuel_type = vehicle.fuel_type
+        mpg = vehicle.combined_mpg
 
     # Example distance (later from Google Maps API)
     distance_miles = calculate_distance(origin, destination)
+    if distance_miles is None:
+        flash(
+            "Could not find a route between those locations. Please check the addresses.",
+            "danger",
+        )
+        return redirect(url_for("home"))
     distance_km = distance_miles * 1.60934  # Convert miles to kilometers
 
     # --- Emissions calculation ---
-    total_emissions = distance_km * factor
+    total_emissions = calculate_emissions(distance_miles, fuel_type, mpg)
     emissions_per_person = total_emissions / passengers
 
     commute = Commute(
@@ -101,7 +90,7 @@ def calculate():
         distance_km=distance_km,
         passengers=passengers,
         total_emissions=total_emissions,
-        emissions_per_person=emissions_per_person
+        emissions_per_person=emissions_per_person,
     )
 
     db.session.add(commute)
@@ -123,10 +112,7 @@ def calculate():
     vehicles = VehicleModel.query.all()
 
     return render_template(
-        "home.html",
-        API_KEY=api_key,
-        vehicles=vehicles,
-        calculation=calculation
+        "home.html", API_KEY=api_key, vehicles=vehicles, calculation=calculation
     )
 
 
@@ -145,6 +131,14 @@ def save_vehicle():
     year = int(request.form.get("year"))
 
     economy_data = Vehicle.fetch_economy_data(make, model, year)
+    existing_vehicle = VehicleModel.query.filter_by(
+        make=make, model=model, year=year
+    ).first()
+
+    if existing_vehicle:
+        # Inform the user it's already there
+        flash(f"Note: {make} {model} ({year}) is already in your list!", "info")
+        return redirect(url_for("home"))
     # If it doesn't exist, proceed with saving
     try:
         new_vehicle = VehicleModel(
@@ -153,12 +147,14 @@ def save_vehicle():
             year=year,
             economy_id=int(economy_data["id"]),
             fuel_type=economy_data["fuelType1"],
-            combined_mpg=float(economy_data["comb08"])
+            combined_mpg=float(economy_data["comb08"]),
         )
         db.session.add(new_vehicle)
         db.session.commit()
+        flash(f"Successfully added {year} {make} {model}!", "success")
     except ValueError as e:
         print("Error saving vehicle:", e)
+        flash("An error occurred while saving.", "danger")
         db.session.rollback()
 
     return redirect(url_for("home"))
@@ -175,9 +171,7 @@ def get_models(make):
 def get_years(make, model):
     """Return a JSON list of available years for a specific make and model."""
     years = sorted(
-        df[
-            (df["make"] == make) & (df["model"] == model)
-        ]["year"].unique().tolist(),
+        df[(df["make"] == make) & (df["model"] == model)]["year"].unique().tolist(),
         reverse=True,
     )
     return jsonify([int(y) for y in years])
@@ -194,7 +188,7 @@ def dashboard():
         "dashboard.html",
         commutes=commutes,
         total_distance=round(total_distance, 2),
-        total_emissions=round(total_emissions, 2)
+        total_emissions=round(total_emissions, 2),
     )
 
 

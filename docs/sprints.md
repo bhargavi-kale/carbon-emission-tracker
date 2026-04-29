@@ -119,3 +119,82 @@ This sprint was mainly exploratory and helped me better understand how the UI st
 - Updates in existing main.py file and HTML files
 - Updates in docs folder with presentation file
 
+---
+
+## What project work have you achieved since last class last week?
+
+This week my primary contribution focused on implementing and integrating the **Dashboard feature** into the Carbon Commute Calculator.
+
+- Created a new **Dashboard page** (`dashboard.html`) to display commute history
+- Implemented the `/dashboard` Flask route to retrieve commute records from the database
+- Added logic to calculate:
+ - Total distance traveled
+ - Total CO₂ emissions across all commutes
+- Modified the `/calculate` route so each commute is saved to the database as a `Commute` object
+- Designed summary cards displaying overall environmental impact statistics
+- Built a trip history table showing vehicle, fuel type, locations, distance, and emissions
+- Connected navigation between the calculator page and the dashboard
+
+Evidence of this work exists in:
+- `dashboard.html`
+- `main.py`
+- `style.css`
+- Database model usage and stored commute entries
+
+---
+
+## What challenges, setbacks, or blockers have you encountered?
+
+The largest challenge was **page formatting and layout restructuring**.
+
+The application was originally designed using a **three-panel layout** (form, map, and results). The dashboard required a completely different layout — a full-width, centered page — which conflicted with the existing global container styling.
+
+Specific challenges included:
+
+- Dashboard content appearing left-aligned instead of centered
+- CSS Grid rules from the calculator layout affecting the dashboard unintentionally
+- Difficulty separating page-specific layouts while still using a shared base template
+- Multiple iterations of CSS adjustments before identifying that the main container wrapper was forcing the layout behavior
+
+Transitioning from a three-panel interface to a single dashboard view required restructuring how templates and CSS were organized.
+
+---
+
+## What is your actionable and feasible plan for this week’s sprint?
+
+- Finalize dashboard formatting and responsiveness
+- Improve visual consistency between calculator and dashboard pages
+- Test database persistence and data accuracy
+- Clean up unused CSS and redundant layout rules
+- Prepare project documentation for final submission
+
+---
+
+## How much time are you allocated for this sprint? When?
+
+- Tuesday evening — 2 hours 
+- Wednesday evening — 2 hours 
+- Friday afternoon — 2–3 hours 
+
+**Total planned time:** approximately 6–7 hours
+
+---
+
+## What specific activities/tasks will you do in the allocated time?
+
+- Test dashboard rendering across screen sizes
+- Verify commute data saves correctly after calculations
+- Refine summary card styling and spacing
+- Perform UI polishing and layout cleanup
+- Update README and documentation files
+- Review GitHub repository organization
+
+---
+
+## What tangible work products will evidence your work?
+
+- `dashboard.html` implementation
+- Updates to `style.css`
+- Modified `/calculate` and `/dashboard` routes in `main.py`
+- Database entries demonstrating saved commutes
+- Git commits showing dashboard development and layout fixes
