@@ -69,6 +69,12 @@ def calculate():
 
     # Example distance (later from Google Maps API)
     distance_miles = calculate_distance(origin, destination)
+    if distance_miles is None:
+        flash(
+            "Could not find a route between those locations. Please check the addresses.",
+            "danger",
+        )
+        return redirect(url_for("home"))
     distance_km = distance_miles * 1.60934  # Convert miles to kilometers
 
     # --- Emissions calculation ---
