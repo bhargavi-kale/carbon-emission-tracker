@@ -11,22 +11,33 @@
 <body class="{% block body_class %}{% endblock %}">
 
 <header>
-    <h1>Carbon Commute Calculator</h1>
+    <div class="header-container">
+        {% set current_page = self.body_class()|trim %}
+        
+        {% if current_page in ['vehicle-bg', 'dashboard-bg'] %}
+            <a href="/" class="back-link-top-left">← Back</a>
+        {% endif %}
+        
+        <h1>Carbon Commute Calculator</h1>
+    </div>
 </header>
 
 
 <main>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
 
-    {% block content %}{% endblock %}
+    {% block content %}{% endblock %} 
+    
 
     
 
@@ -113,6 +124,19 @@ function renderDirections(origin, destination) {
 
 <script async
 src="https://maps.googleapis.com/maps/api/js?key={{ API_KEY }}&callback=initMap">
+</script>
+<script>
+    // Automatically hide flash messages after 4 seconds
+    document.addEventListener("DOMContentLoaded", function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.animation = "fadeOut 1s forwards";
+                // Remove from DOM after fade animation finishes
+                setTimeout(() => alert.remove(), 1000);
+            }, 4000); // 4000ms = 4 seconds
+        });
+    });
 </script>
 </body>
 </html>

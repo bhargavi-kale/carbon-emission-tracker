@@ -6,7 +6,7 @@ Handles routing for vehicle data and integration with Google Maps API.
 import os
 import pandas as pd
 from dotenv import load_dotenv
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, render_template, jsonify, request, redirect, url_for, flash
 
 from models import db, VehicleModel, Commute
 from src.route import calculate_distance
@@ -125,6 +125,14 @@ def save_vehicle():
     year = int(request.form.get("year"))
 
     economy_data = Vehicle.fetch_economy_data(make, model, year)
+    existing_vehicle = VehicleModel.query.filter_by(
+        make=make, model=model, year=year
+    ).first()
+
+    if existing_vehicle:
+        # Inform the user it's already there
+        flash(f"Note: {make} {model} ({year}) is already in your list!", "info")
+        return redirect(url_for("home"))
     # If it doesn't exist, proceed with saving
     try:
         new_vehicle = VehicleModel(
@@ -137,8 +145,10 @@ def save_vehicle():
         )
         db.session.add(new_vehicle)
         db.session.commit()
+        flash(f"Successfully added {year} {make} {model}!", "success")
     except ValueError as e:
         print("Error saving vehicle:", e)
+        flash("An error occurred while saving.", "danger")
         db.session.rollback()
 
     return redirect(url_for("home"))

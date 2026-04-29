@@ -46,6 +46,46 @@ main {
     height: 92%; 
     margin: 0 auto;
 }
+/* Floating Flash Messages */
+.flash-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999; /* Higher than all other elements */
+    width: 300px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background-color: var(--accent-green);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border-left: 5px solid var(--accent-green-dark);
+    /* Animation for smooth appearance */
+    animation: slideIn 0.5s ease-out;
+}
+
+.alert-error, .alert-danger {
+    background-color: #d9534f;
+    border-left-color: #a94442;
+}
+.alert-error, .alert-info {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
 
 .left-panel, .right-panel, .map-panel {
     background-color: var(--panel-bg);
@@ -93,6 +133,49 @@ footer {
     padding: 10px; text-align: center; font-size: 0.8rem; color: #000; font-weight: bold;
     background-color: rgba(249, 242, 196, 0.7); border-radius: 45px;
     width: fit-content; margin: 5px auto 20px auto; position: relative; z-index: 2;
+}
+header {
+    padding: 20px 0;
+    width: 100%;
+    position: relative; /* Required for the absolute positioning of the button */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-container {
+    width: 95%;
+    max-width: var(--max-width);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.back-link-top-left {
+    position: absolute;
+    left: 0; /* Forces it to the far left */
+    text-decoration: none;
+    color: #4a7c59;
+    font-weight: bold;
+    font-size: 1rem;
+    border: 1.5px solid #4a7c59;
+    padding: 6px 15px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.5); /* Slight visibility boost */
+    transition: all 0.3s ease;
+}
+
+.back-link-top-left:hover {
+    background-color: #4a7c59;
+    color: white;
+}
+
+h1 {
+    margin: 0;
+    font-size: 30px;
+    color: var(--primary-color);
+    text-align: center;
 }
 
 
@@ -238,3 +321,4 @@ body.dashboard-bg main {
         flex: 0 1 200px;
     }
 }
+
