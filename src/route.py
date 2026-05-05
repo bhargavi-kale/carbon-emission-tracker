@@ -6,14 +6,18 @@ route metrics such as distance. The real implementation should call
 an external routing API (for example, Google Routes API) to populate
 the distance and other route metadata.
 """
+
 try:
     from dotenv import load_dotenv
-except Exception:
+except ImportError:
     def load_dotenv():
+        """Handling exception in loading env file"""
         return None
+
+
 import os
-import requests
 import json
+import requests
 
 
 class Route:
@@ -43,40 +47,39 @@ class Route:
             The distance for the route in miles.
         """
         # Placeholder for HTTP request to Google Route Matrix API
-        #if self.distance == 0:
-        #    self.distance = 100  # Placeholder distance in miles to prevent failure, replace this with API
-        #return self.distance
+        # if self.distance == 0:
+        #    self.distance = 100  # Placeholder distance in miles to prevent
+        #  failure, replace this with API
+        # return self.distance
         load_dotenv()
 
-        API_KEY = os.getenv("GOOGLE_API_KEY") # DO NOT PUSH THIS TO PUBLIC REPO
+        api_key = os.getenv("GOOGLE_API_KEY")  # DO NOT PUSH THIS TO PUBLIC REPO
         url = "https://routes.googleapis.com/directions/v2:computeRoutes"
 
         headers = {
             "Content-Type": "application/json",
-            "X-Goog-Api-Key": API_KEY,
-            "X-Goog-FieldMask": "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
+            "X-Goog-Api-Key": api_key,
+            "X-Goog-FieldMask":
+            "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline",
         }
 
         body = {
-            "origin": {
-                "address": self.origin
-            },
-            "destination": {
-                "address": self.destination
-            },
+            "origin": {"address": self.origin},
+            "destination": {"address": self.destination},
             "travelMode": "DRIVE",
             "routingPreference": "TRAFFIC_AWARE",
             "computeAlternativeRoutes": False,
             "routeModifiers": {
                 "avoidTolls": False,
                 "avoidHighways": False,
-                "avoidFerries": False
+                "avoidFerries": False,
             },
             "languageCode": "en-US",
-            "units": "METRIC"
+            "units": "METRIC",
         }
 
-        response = requests.post(url, headers=headers, data=json.dumps(body))
+        response = requests.post(url, headers=headers, data=json.dumps(body),
+                                 timeout=20)
         data = response.json()
         if "routes" in data and len(data["routes"]) > 0:
             distance_meters = data["routes"][0]["distanceMeters"]
@@ -99,7 +102,7 @@ class Route:
         """
         return meters * 0.000621371
 
-   
+
 def calculate_distance(origin: str, destination: str) -> float:
     """Calculate distance between two locations using the Route class.
 

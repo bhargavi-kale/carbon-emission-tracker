@@ -3,7 +3,7 @@ Integration tests for the Flask application endpoints.
 This module validates status codes, response shapes, and internal routing logic
 while maintaining network independence and database isolation.
 """
-
+# pylint: disable=redefined-outer-name
 import pytest
 from main import app, db
 from models import VehicleModel

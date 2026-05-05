@@ -131,6 +131,9 @@ def save_vehicle():
     year = int(request.form.get("year"))
 
     economy_data = Vehicle.fetch_economy_data(make, model, year)
+    if not economy_data:
+        flash(f"Could not find fuel economy data for {year} {make} {model}.", "danger")
+        return redirect(url_for("add_vehicle"))
     existing_vehicle = VehicleModel.query.filter_by(
         make=make, model=model, year=year
     ).first()
@@ -179,6 +182,7 @@ def get_years(make, model):
 
 @app.route("/dashboard")
 def dashboard():
+    """Handle Dashboard page"""
     commutes = Commute.query.all()
 
     total_distance = sum(c.distance_km for c in commutes)
