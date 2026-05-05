@@ -76,6 +76,19 @@ main {
     background-color: #d9edf7;
     color: #31708f;
 }
+.instruction-text {
+    background-color: #fcf8e3;
+    border: 1px solid #faebcc;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.btn-calculate.disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    pointer-events: none;
+}
 
 @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
