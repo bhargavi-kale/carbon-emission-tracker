@@ -19,3 +19,6 @@ env/
 
 # macOS metadata
 .DS_Store
+
+#pytest coverage
+.coverage
