@@ -72,19 +72,44 @@ carbon-commute/
 │
 ├── data/
 │   └── vehicles.csv
+├── process/
+│   └── meeting-notes.md
+├── src/
+│   └── __init__.py
+│   └── route.py
+│   └── trip.py
+│   └── vehicle.py
 ├── docs/
+│   └── api/
+│   │   └── src
+│   │   │   └── route.html
+│   │   │   └── trip.html
+│   │   │   └── vehicle.html
+│   │   └── index.html
+│   │   └── search.js
+│   │   └── search.html
 │   └── sprints.md
 │   └── Projectoutline.md
 ├── instance/
 │   └── carbon_commute.db
 ├── static/
+│   └── background.png
+│   └── background2.png
+│   └── flowerfield.gif
 │   └── style.css
 ├── templates/
 │   ├── home.html
 │   └── index.html
 │   └── vehicle.html
+│   └── dashboard.html
+── tests/
+│   ├── test_main.py
+│   └── test_route.py
+│   └── test_trip.py
+│   └── test_vehicle.py
 ├── venv
 ├── .env
+├── .env.example
 ├── .gitignore
 ├── dev-requirements.txt
 ├── main.py
