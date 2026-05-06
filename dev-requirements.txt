@@ -10,6 +10,9 @@ pylint==3.3.4
 # Static type checking
 mypy==1.14.1
 
+#pytest
+pytest
+
 # Flask/SQLAlchemy type stubs (needed by mypy)
 types-Flask
 sqlalchemy[mypy]==2.0.37

@@ -198,3 +198,28 @@ Transitioning from a three-panel interface to a single dashboard view required r
 - Modified `/calculate` and `/dashboard` routes in `main.py`
 - Database entries demonstrating saved commutes
 - Git commits showing dashboard development and layout fixes
+
+# Sprint-3 Bhargavi Kale, Isabella Velazquez Abelardo
+
+## What project work have you achieved since last class last week?
+- Implemented flash messages with a 4-second display using event listeners and improved error handling.
+- Added Back buttons for navigation from Vehicle and Dashboard screens to the home page.
+- Integrated vehicle MPG data to support CO₂ emissions calculation.
+- Worked on Dashboard to display the Trip History and co2 emission details.
+
+## What challenges, setbacks, or blockers have you encountered?
+- Problem with changing existing HTML and CCS files.
+
+## What is your actionable and feasible plan for this week’s sprint?
+- Perform thorough application testing.
+- Prepare presentation materials.
+
+## How much time are you allocated for this sprint? When?
+- Sunday and Tuesday (4–5 hours)  
+
+## What specific activities/tasks will you do in the allocated time?
+- Test the application in different scenarios and fix issues
+- Prepare presentation
+
+## What tangible work products will evidence your work?
+- Updated documentation in the docs folder, including the presentation file.

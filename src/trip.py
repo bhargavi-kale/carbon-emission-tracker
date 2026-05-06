@@ -1,5 +1,6 @@
 """CO₂ emissions calculator using distance, MPG, and fuel-type emission factors."""
 
+
 def calculate_emissions(distance, fuel_type, mpg):
     """Estimate CO2 emissions for this trip.
 
