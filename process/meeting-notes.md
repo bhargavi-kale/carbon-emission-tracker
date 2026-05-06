@@ -6,6 +6,7 @@
 - Initialize the database with Vehicle, Route, and Trip models.
 
 **Bella:**
+- Create Google accounts and generate an API key and setup in the code.
 - Work on building the basic home layout using HTML and CSS.
 
 ---
